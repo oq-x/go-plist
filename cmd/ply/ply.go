@@ -14,9 +14,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/deitrix/go-plist"
 	"github.com/jessevdk/go-flags"
 	"gopkg.in/yaml.v1"
-	"howett.net/plist"
 )
 
 //import "github.com/mgutz/ansi"

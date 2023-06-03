@@ -106,7 +106,6 @@ func (p *textPlistGenerator) writePlistValue(pval cfValue) {
 
 	switch pval := pval.(type) {
 	case *cfDictionary:
-		pval.sort()
 		p.writer.Write([]byte(`{`))
 		p.deltaIndent(1)
 		for i, k := range pval.keys {

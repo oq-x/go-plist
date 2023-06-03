@@ -2,9 +2,8 @@ package plist
 
 import (
 	"hash/crc32"
-	"sort"
-	"time"
 	"strconv"
+	"time"
 )
 
 // magic value used in the non-binary encoding of UIDs
@@ -17,7 +16,7 @@ type cfValue interface {
 }
 
 type cfDictionary struct {
-	keys   sort.StringSlice
+	keys   []string
 	values []cfValue
 }
 
@@ -27,23 +26,6 @@ func (*cfDictionary) typeName() string {
 
 func (p *cfDictionary) hash() interface{} {
 	return p
-}
-
-func (p *cfDictionary) Len() int {
-	return len(p.keys)
-}
-
-func (p *cfDictionary) Less(i, j int) bool {
-	return p.keys.Less(i, j)
-}
-
-func (p *cfDictionary) Swap(i, j int) {
-	p.keys.Swap(i, j)
-	p.values[i], p.values[j] = p.values[j], p.values[i]
-}
-
-func (p *cfDictionary) sort() {
-	sort.Sort(p)
 }
 
 func (p *cfDictionary) maybeUID(lax bool) cfValue {

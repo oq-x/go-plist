@@ -93,7 +93,6 @@ func (p *xmlPlistGenerator) element(n string, v string) {
 }
 
 func (p *xmlPlistGenerator) writeDictionary(dict *cfDictionary) {
-	dict.sort()
 	p.openTag(xmlDictTag)
 	for i, k := range dict.keys {
 		p.element(xmlKeyTag, k)

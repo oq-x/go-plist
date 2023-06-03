@@ -276,6 +276,40 @@ func (p *Decoder) unmarshalDictionary(dict *cfDictionary, val reflect.Value) {
 			p.unmarshal(sval, mapElem)
 			val.SetMapIndex(keyv, mapElem)
 		}
+	case reflect.Slice, reflect.Array:
+		var n int
+		switch val.Kind() {
+		case reflect.Slice:
+			// Slice of element values.
+			// Grow slice.
+			cnt := len(dict.values) + val.Len()
+			if cnt >= val.Cap() {
+				ncap := 2 * cnt
+				if ncap < 4 {
+					ncap = 4
+				}
+				new := reflect.MakeSlice(val.Type(), val.Len(), ncap)
+				reflect.Copy(new, val)
+				val.Set(new)
+			}
+			n = val.Len()
+			val.SetLen(cnt)
+		case reflect.Array:
+			if len(dict.values) > val.Cap() {
+				panic(fmt.Errorf("plist: attempted to unmarshal %d values into an array of size %d", len(dict.values), val.Cap()))
+			}
+		}
+
+		// Recur to read element into slice.
+		for i, key := range dict.keys {
+			value := dict.values[i]
+			sval := &cfDictionary{
+				keys:   []string{"key", "value"},
+				values: []cfValue{cfString(key), value},
+			}
+			p.unmarshal(sval, val.Index(n))
+			n++
+		}
 	default:
 		panic(&incompatibleDecodeTypeError{typ, dict.typeName()})
 	}

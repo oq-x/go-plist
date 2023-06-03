@@ -8,7 +8,7 @@ import (
 	"sort"
 	"time"
 
-	"howett.net/plist"
+	"github.com/deitrix/go-plist"
 )
 
 func PrettyPrint(w io.Writer, val interface{}) {

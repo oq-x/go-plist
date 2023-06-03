@@ -50,7 +50,6 @@ func (p *bplistGenerator) flattenPlistValue(pval cfValue) {
 
 	switch pval := pval.(type) {
 	case *cfDictionary:
-		pval.sort()
 		for _, k := range pval.keys {
 			p.flattenPlistValue(cfString(k))
 		}

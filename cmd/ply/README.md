@@ -1,11 +1,11 @@
 # Ply
-Property list pretty-printer powered by `howett.net/plist`.
+Property list pretty-printer powered by `github.com/deitrix/go-plist`.
 
 _verb. work with (a tool, especially one requiring steady, rhythmic movements)._
 
 ## Installation
 
-`go get howett.net/plist/cmd/ply`
+`go get github.com/deitrix/go-plist/cmd/ply`
 
 ## Usage
 
