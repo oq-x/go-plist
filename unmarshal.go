@@ -248,6 +248,20 @@ func (p *Decoder) unmarshalDictionary(dict *cfDictionary, val reflect.Value) {
 	typ := val.Type()
 	switch val.Kind() {
 	case reflect.Struct:
+		if val.Type() == reflect.TypeOf(OrderedDict{}) {
+			od := OrderedDict{
+				Keys:   make([]string, len(dict.keys)),
+				Values: make([]interface{}, len(dict.keys)),
+			}
+			for i, k := range dict.keys {
+				sval := dict.values[i]
+				od.Keys[i] = k
+				p.unmarshal(sval, reflect.ValueOf(&od.Values[i]).Elem())
+			}
+			val.Set(reflect.ValueOf(od))
+			return
+		}
+
 		tinfo, err := getTypeInfo(typ)
 		if err != nil {
 			panic(err)
@@ -275,40 +289,6 @@ func (p *Decoder) unmarshalDictionary(dict *cfDictionary, val reflect.Value) {
 
 			p.unmarshal(sval, mapElem)
 			val.SetMapIndex(keyv, mapElem)
-		}
-	case reflect.Slice, reflect.Array:
-		var n int
-		switch val.Kind() {
-		case reflect.Slice:
-			// Slice of element values.
-			// Grow slice.
-			cnt := len(dict.values) + val.Len()
-			if cnt >= val.Cap() {
-				ncap := 2 * cnt
-				if ncap < 4 {
-					ncap = 4
-				}
-				new := reflect.MakeSlice(val.Type(), val.Len(), ncap)
-				reflect.Copy(new, val)
-				val.Set(new)
-			}
-			n = val.Len()
-			val.SetLen(cnt)
-		case reflect.Array:
-			if len(dict.values) > val.Cap() {
-				panic(fmt.Errorf("plist: attempted to unmarshal %d values into an array of size %d", len(dict.values), val.Cap()))
-			}
-		}
-
-		// Recur to read element into slice.
-		for i, key := range dict.keys {
-			value := dict.values[i]
-			sval := &cfDictionary{
-				keys:   []string{"key", "value"},
-				values: []cfValue{cfString(key), value},
-			}
-			p.unmarshal(sval, val.Index(n))
-			n++
 		}
 	default:
 		panic(&incompatibleDecodeTypeError{typ, dict.typeName()})
@@ -355,11 +335,20 @@ func (p *Decoder) arrayInterface(a *cfArray) []interface{} {
 	return out
 }
 
-func (p *Decoder) dictionaryInterface(dict *cfDictionary) map[string]interface{} {
-	out := make(map[string]interface{})
+func (p *Decoder) dictionaryInterface(dict *cfDictionary) OrderedDict {
+	out := OrderedDict{
+		Keys:   make([]string, len(dict.keys)),
+		Values: make([]interface{}, len(dict.keys)),
+	}
 	for i, k := range dict.keys {
 		subv := dict.values[i]
-		out[k] = p.valueInterface(subv)
+		out.Keys[i] = k
+		out.Values[i] = p.valueInterface(subv)
 	}
 	return out
+}
+
+type OrderedDict struct {
+	Keys   []string
+	Values []interface{}
 }

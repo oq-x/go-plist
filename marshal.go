@@ -68,6 +68,10 @@ func (p *Encoder) marshalTextInterface(marshalable encoding.TextMarshaler) cfVal
 
 // marshalStruct marshals a reflected struct value to a plist dictionary
 func (p *Encoder) marshalStruct(typ reflect.Type, val reflect.Value) cfValue {
+	if typ == reflect.TypeOf(OrderedDict{}) {
+		return p.marshalOrderedDict(val)
+	}
+
 	tinfo, _ := getTypeInfo(typ)
 
 	dict := &cfDictionary{
@@ -84,6 +88,19 @@ func (p *Encoder) marshalStruct(typ reflect.Type, val reflect.Value) cfValue {
 	}
 
 	return dict
+}
+
+func (p *Encoder) marshalOrderedDict(val reflect.Value) cfValue {
+	dict := val.Interface().(OrderedDict)
+	cfDict := &cfDictionary{
+		keys:   make([]string, len(dict.Keys)),
+		values: make([]cfValue, len(dict.Values)),
+	}
+	for i, key := range dict.Keys {
+		cfDict.keys[i] = key
+		cfDict.values[i] = p.marshal(reflect.ValueOf(dict.Values[i]))
+	}
+	return cfDict
 }
 
 func (p *Encoder) marshalTime(val reflect.Value) cfValue {
