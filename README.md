@@ -1,7 +1,7 @@
 # plist - A pure Go property list transcoder [![coverage report](https://gitlab.howett.net/go/plist/badges/main/coverage.svg)](https://gitlab.howett.net/go/plist/commits/main)
 ## INSTALL
 ```
-$ go get github.com/deitrix/go-plist
+$ go get github.com/oq-x/go-plist
 ```
 
 ## FEATURES
@@ -11,7 +11,7 @@ $ go get github.com/deitrix/go-plist
 ```go
 package main
 import (
-	"github.com/deitrix/go-plist"
+	"github.com/oq-x/go-plist"
 	"os"
 )
 func main() {
