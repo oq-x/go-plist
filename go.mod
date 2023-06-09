@@ -1,4 +1,4 @@
-module github.com/deitrix/go-plist
+module github.com/oq-x/go-plist
 
 go 1.12
 
